@@ -23,7 +23,6 @@ class Graph {
         int len;
 
         Graph();
-        vector<Edge> getNeighborsInternal(int vertex);
 
     public:
         virtual int addVertex(const string& label, double heuristicWeight = 0.0);
@@ -31,6 +30,7 @@ class Graph {
         void removeVertex(const string& label);
         void print() const;
         vector<string> getNeighbors(const string& label);
+        vector<Edge> getNeighborsInternal(int vertex);
         pair<vector<string>, double> dijkstra(const string& from, const string& to);
         pair<vector<string>, int> DFS(const string& from, const string& to);
         pair<vector<string>, int> BFS(const string& from, const string& to);
