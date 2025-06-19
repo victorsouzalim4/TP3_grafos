@@ -4,6 +4,7 @@
 #include "Utils/segmentation.h"
 #include "utils/imageToGraph.h"
 #include "vertex.h"
+#include "utils/colorSegments.h"
 
 #include <opencv2/opencv.hpp> // Novo include
 
@@ -14,9 +15,10 @@ int main()
 
     UndirectedGraph g;
     Segmentation s;
+    ColorSegmentation c;
 
     // Carrega imagem
-    cv::Mat img = cv::imread("./src/images/imagem3.jpg", cv::IMREAD_COLOR);
+    cv::Mat img = cv::imread("./src/images/imagem2.png", cv::IMREAD_COLOR);
     if (img.empty())
     {
         cerr << "Erro ao carregar a imagem!" << endl;
@@ -43,9 +45,13 @@ int main()
 
     g.print(); // Ver conexões com pesos entre cores
 
-    s.segmentGraph(g, 300);
+    std::vector<int> componentIds = s.segmentGraph(g, 1000);
 
+    cv::Mat imgProcess = c.colorSegments(img, componentIds);
 
+    // Exibir resultado
+    cv::imshow("Segmentos", imgProcess);
+    cv::waitKey(0);
 
     return 0;
 }
