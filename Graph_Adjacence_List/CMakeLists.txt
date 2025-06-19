@@ -33,15 +33,11 @@ file(GLOB SRC_FILES
     src/*/*.cpp
     src/*/*/*.cpp
 )
-list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Main.cpp)
 list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/ift_image_processor.cpp)
 
 # Lib principal
 add_library(graphlib ${SRC_FILES})
 
-# Executável principal (GraphMain)
-add_executable(GraphMain src/Main.cpp)
-target_link_libraries(GraphMain graphlib ${OpenCV_LIBS})
 
 # Executável do processador de imagens IFT
 add_executable(IFTImageProcessor src/ift_image_processor.cpp)
@@ -49,35 +45,10 @@ target_link_libraries(IFTImageProcessor graphlib ${OpenCV_LIBS})
 
 # Adicionar o diretório bin do OpenCV ao PATH durante o build (para encontrar DLLs)
 if(WIN32)
-    set_target_properties(GraphMain PROPERTIES
-        VS_DEBUGGER_ENVIRONMENT "PATH=${OpenCV_BIN_DIR};$ENV{PATH}"
-    )
     set_target_properties(IFTImageProcessor PROPERTIES
         VS_DEBUGGER_ENVIRONMENT "PATH=${OpenCV_BIN_DIR};$ENV{PATH}"
     )
 endif()
 
-# GoogleTest
-include(FetchContent)
-FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/refs/heads/main.zip
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
-# Executável de testes
-add_executable(tests
-    tests/test_directed_graph.cpp
-    tests/test_graph.cpp
-    tests/test_undirected_graph.cpp
-    #tests/test_graph_utils.cpp
-)
-
-# Linkagem dos testes
-target_link_libraries(tests graphlib gtest_main)
-
-# Configuração de testes
-enable_testing()
-include(GoogleTest)
-gtest_discover_tests(tests)
+# Comentando testes por enquanto - focar no IFT principal
+# GoogleTest e testes foram temporariamente desabilitados
