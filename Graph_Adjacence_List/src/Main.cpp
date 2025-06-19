@@ -45,7 +45,7 @@ int main()
 
     g.print(); // Ver conexões com pesos entre cores
 
-    s.segmentGraph(g, 300);
+    s.segmentGraph(g, 300, 100);
 
 
 
