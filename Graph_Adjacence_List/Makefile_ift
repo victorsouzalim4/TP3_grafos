@@ -1,0 +1,63 @@
+# Makefile para compilar testes do IFT
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -I include
+SRCDIR = src
+INCDIR = include
+OBJDIR = obj
+
+# Cria diretório obj se não existir
+$(shell mkdir -p $(OBJDIR))
+
+# Arquivos de implementação
+SOURCES = pixel.cpp image.cpp seed_set.cpp path_cost_function.cpp ift_result.cpp ift_algorithm.cpp bucket_queue.cpp ift_optimized_algorithm.cpp
+OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+
+# Compilações de objetos
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Executáveis de teste
+test_cost_functions: $(OBJDIR)/test_cost_functions.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+test_ift_algorithm: $(OBJDIR)/test_ift_algorithm.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+test_optimized_ift: $(OBJDIR)/test_optimized_ift.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+test_optimized_basic: $(OBJDIR)/test_optimized_basic.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+# Objetos de teste
+$(OBJDIR)/test_cost_functions.o: $(SRCDIR)/test_cost_functions.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(OBJDIR)/test_ift_algorithm.o: $(SRCDIR)/test_ift_algorithm.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(OBJDIR)/test_optimized_ift.o: $(SRCDIR)/test_optimized_ift.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(OBJDIR)/test_optimized_basic.o: $(SRCDIR)/test_optimized_basic.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Alvos principais
+all: test_cost_functions test_ift_algorithm test_optimized_ift test_optimized_basic
+
+test_cost: test_cost_functions
+	./test_cost_functions
+
+test_ift: test_ift_algorithm
+	./test_ift_algorithm
+
+test_opt: test_optimized_ift
+	./test_optimized_ift
+
+test_basic: test_optimized_basic
+	./test_optimized_basic
+
+clean:
+	rm -rf $(OBJDIR) test_cost_functions test_ift_algorithm test_optimized_ift test_optimized_basic test_cost_functions.exe test_ift_algorithm.exe test_optimized_ift.exe test_optimized_basic.exe
+
+.PHONY: all clean test_cost test_ift test_opt test_basic

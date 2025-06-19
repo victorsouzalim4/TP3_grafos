@@ -37,7 +37,7 @@ int main(){
     //     cerr << "Error: " << e.what() << endl;
     // }
 
-        std::vector<std::vector<std::array<uint8_t, 3>>> image = {
+    std::vector<std::vector<std::array<uint8_t, 3>>> image = {
         { {255, 0, 0}, {255, 0, 0} },
         { {0, 0, 255}, {255, 255, 0} },
         { {0, 0, 255}, {255, 255, 0} }
