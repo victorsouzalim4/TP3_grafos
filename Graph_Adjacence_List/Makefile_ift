@@ -1,63 +1,92 @@
-# Makefile para compilar testes do IFT
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -I include
-SRCDIR = src
-INCDIR = include
-OBJDIR = obj
+# Makefile para compilar IFT e processador de imagens no Windows
+# Baseado no Makefile funcional original
 
-# Cria diretório obj se não existir
-$(shell mkdir -p $(OBJDIR))
+# Diretórios - DEFINIR PRIMEIRO!
+SRC_DIR := src
+INC_DIR := include
+BUILD_DIR := build
+OPENCV_DIR := third_party/opencv
 
-# Arquivos de implementação
-SOURCES = pixel.cpp image.cpp seed_set.cpp path_cost_function.cpp ift_result.cpp ift_algorithm.cpp bucket_queue.cpp ift_optimized_algorithm.cpp
-OBJECTS = $(SOURCES:%.cpp=$(OBJDIR)/%.o)
+# Arquivos fonte específicos do IFT (ATUALIZADOS com nova estrutura)
+IFT_SOURCES := $(SRC_DIR)/ift/data_structures/pixel.cpp \
+               $(SRC_DIR)/ift/data_structures/image.cpp \
+               $(SRC_DIR)/ift/data_structures/seed_set.cpp \
+               $(SRC_DIR)/ift/algorithms/path_cost_function.cpp \
+               $(SRC_DIR)/ift/ift_result.cpp \
+               $(SRC_DIR)/ift/algorithms/ift_algorithm.cpp \
+               $(SRC_DIR)/ift/data_structures/bucket_queue.cpp \
+               $(SRC_DIR)/ift/algorithms/ift_optimized_algorithm.cpp \
+               $(SRC_DIR)/utils/opencv_ift_bridge.cpp \
+               $(SRC_DIR)/ift_image_processor.cpp
 
-# Compilações de objetos
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Target principal
+TARGET := ift_image_processor.exe
 
-# Executáveis de teste
-test_cost_functions: $(OBJDIR)/test_cost_functions.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+# Configuração do compilador
+CXX := g++
+CXXFLAGS := -Wall -Wextra -std=c++17 -O2 -g \
+    -I$(INC_DIR) \
+    -I$(OPENCV_DIR)/include
 
-test_ift_algorithm: $(OBJDIR)/test_ift_algorithm.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+# Linkagem CORRETA (mesmo padrão do Makefile funcional)
+LDFLAGS := -L$(OPENCV_DIR)/x64/mingw/lib \
+    -lopencv_core455 \
+    -lopencv_imgproc455 \
+    -lopencv_imgcodecs455 \
+    -lopencv_highgui455
 
-test_optimized_ift: $(OBJDIR)/test_optimized_ift.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+# Regra principal
+all: $(TARGET)
 
-test_optimized_basic: $(OBJDIR)/test_optimized_basic.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+# Como gerar o binário (mesmo padrão do Makefile funcional)
+$(TARGET): $(IFT_SOURCES)
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
-# Objetos de teste
-$(OBJDIR)/test_cost_functions.o: $(SRCDIR)/test_cost_functions.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(OBJDIR)/test_ift_algorithm.o: $(SRCDIR)/test_ift_algorithm.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(OBJDIR)/test_optimized_ift.o: $(SRCDIR)/test_optimized_ift.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(OBJDIR)/test_optimized_basic.o: $(SRCDIR)/test_optimized_basic.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Alvos principais
-all: test_cost_functions test_ift_algorithm test_optimized_ift test_optimized_basic
-
-test_cost: test_cost_functions
-	./test_cost_functions
-
-test_ift: test_ift_algorithm
-	./test_ift_algorithm
-
-test_opt: test_optimized_ift
-	./test_optimized_ift
-
-test_basic: test_optimized_basic
-	./test_optimized_basic
-
+# Limpar
 clean:
-	rm -rf $(OBJDIR) test_cost_functions test_ift_algorithm test_optimized_ift test_optimized_basic test_cost_functions.exe test_ift_algorithm.exe test_optimized_ift.exe test_optimized_basic.exe
+	@if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
+	@if exist $(TARGET) del $(TARGET)
+	@if exist test_simple.exe del test_simple.exe
 
-.PHONY: all clean test_cost test_ift test_opt test_basic
+# Limpar e recompilar
+rebuild: clean all
+
+# Testes com PATH configurado
+test: $(TARGET)
+	@echo "Executando teste com imagem automatica..."
+	@set PATH=%PATH%;$(OPENCV_DIR)\x64\mingw\bin && .\$(TARGET) $(SRC_DIR)\images\imagem1.png -a 4 -o teste_imagem1.png
+	@echo "Teste concluido!"
+
+test_interactive: $(TARGET)
+	@echo "Executando teste interativo..."
+	@set PATH=%PATH%;$(OPENCV_DIR)\x64\mingw\bin && .\$(TARGET) $(SRC_DIR)\images\imagem2.png -i -s -o teste_interativo.png
+
+test_optimized: $(TARGET)
+	@echo "Testando algoritmo otimizado..."
+	@set PATH=%PATH%;$(OPENCV_DIR)\x64\mingw\bin && .\$(TARGET) $(SRC_DIR)\images\imagem3.jpg -a 6 -opt -s -o teste_otimizado.png
+
+# Execução manual
+run: $(TARGET)
+	@echo "Para executar manualmente:"
+	@echo "set PATH=%%PATH%%;$(OPENCV_DIR)\x64\mingw\bin"
+	@echo ".\$(TARGET) <imagem> [opcoes]"
+
+help:
+	@echo "🎯 PROJETO IFT - TARGETS DISPONÍVEIS:"
+	@echo ""
+	@echo "📦 EXECUTÁVEIS:"
+	@echo "  all          - Compila processador IFT principal"
+	@echo "  clean        - Remove arquivos compilados"
+	@echo "  rebuild      - Limpa e recompila"
+	@echo ""
+	@echo "🧪 TESTES:"
+	@echo "  test         - Teste automático com imagem1"
+	@echo "  test_interactive - Teste interativo com imagem2"  
+	@echo "  test_optimized   - Teste otimizado com imagem3"
+	@echo ""
+	@echo "🛠️ UTILITÁRIOS:"
+	@echo "  run          - Mostra como executar"
+	@echo "  help         - Mostra esta ajuda"
+
+.PHONY: all clean rebuild test test_interactive test_optimized run help 

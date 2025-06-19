@@ -33,6 +33,22 @@ bool UnionFind::join(int u, int v, double weight, double k) {
     return true;
 }
 
+void UnionFind::forceJoin(int u, int v) {
+    u = find(u);
+    v = find(v);
+    if (u == v) return;
+
+    // Manter a árvore balanceada
+    if (rank[u] < rank[v]) std::swap(u, v);
+
+    parent[v] = u;
+    size[u] += size[v];
+    internalDiff[u] = std::max(internalDiff[u], internalDiff[v]);
+
+    if (rank[u] == rank[v])
+        rank[u]++;
+}
+
 int UnionFind::getSize(int u) {
     return size[find(u)];
 }

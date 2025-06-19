@@ -10,7 +10,7 @@
 
 class Segmentation {
 public:
-    static void segmentGraph(UndirectedGraph& graph, double k);
+    static vector<int> segmentGraph(UndirectedGraph& graph, double k, int min_size);
 };
 
 #endif

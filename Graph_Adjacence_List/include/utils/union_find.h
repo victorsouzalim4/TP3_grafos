@@ -18,6 +18,7 @@ public:
     bool join(int u, int v, double weight, double k);
     int getSize(int u);
     double getInternalDiff(int u);
+    void forceJoin(int u, int v);
 };
 
 #endif

@@ -131,11 +131,22 @@ std::unique_ptr<IFTResult> OptimizedIFTAlgorithm::runDiscretizedIFT(
     while (!discretizedQueue.empty()) {
         Pixel currentPixel = discretizedQueue.pop();
         
-        processNeighbors(currentPixel, *result, image, costFunction, 
-                        [&](const Pixel& pixel, double cost) {
-                            discretizedQueue.push(pixel, cost);
+                        // Processa vizinhos inline
+                    auto neighbors = image.getNeighbors(currentPixel, eightConnected);
+                    for (const Pixel& neighbor : neighbors) {
+                        double currentCost = result->getCost(currentPixel);
+                        double arcWeight = costFunction.getArcWeight(currentPixel, neighbor, image);
+                        double newCost = costFunction.extendCost(currentCost, arcWeight);
+                        
+                        if (newCost < result->getCost(neighbor)) {
+                            result->setPredecessor(neighbor, currentPixel);
+                            result->setCost(neighbor, newCost);
+                            result->setLabel(neighbor, result->getLabel(currentPixel));
+                            
+                            discretizedQueue.push(neighbor, newCost);
                             lastOptStats.bucketOperations++;
-                        });
+                        }
+                    }
     }
     
     auto endTime = std::chrono::high_resolution_clock::now();
@@ -264,10 +275,21 @@ void OptimizedIFTAlgorithm::processHybridMainLoop(
     while (!hybridQueue.empty()) {
         Pixel currentPixel = hybridQueue.pop();
         
-        processNeighbors(currentPixel, result, image, costFunction,
-                        [&](const Pixel& pixel, double cost) {
-                            hybridQueue.push(pixel, cost);
-                        });
+                            // Processa vizinhos inline
+                    auto neighbors = image.getNeighbors(currentPixel, eightConnected);
+                    for (const Pixel& neighbor : neighbors) {
+                        double currentCost = result.getCost(currentPixel);
+                        double arcWeight = costFunction.getArcWeight(currentPixel, neighbor, image);
+                        double newCost = costFunction.extendCost(currentCost, arcWeight);
+                        
+                        if (newCost < result.getCost(neighbor)) {
+                            result.setPredecessor(neighbor, currentPixel);
+                            result.setCost(neighbor, newCost);
+                            result.setLabel(neighbor, result.getLabel(currentPixel));
+                            
+                            hybridQueue.push(neighbor, newCost);
+                        }
+                    }
     }
 }
 
@@ -466,10 +488,21 @@ void LIFOIFTAlgorithm::processLIFOMainLoop(
     while (!tieQueue.empty()) {
         Pixel currentPixel = tieQueue.pop();
         
-        processNeighbors(currentPixel, result, image, costFunction,
-                        [&](const Pixel& pixel, double cost) {
-                            tieQueue.push(pixel, static_cast<int>(cost));
-                        });
+                            // Processa vizinhos inline 
+                    auto neighbors = image.getNeighbors(currentPixel, eightConnected);
+                    for (const Pixel& neighbor : neighbors) {
+                        double currentCost = result.getCost(currentPixel);
+                        double arcWeight = costFunction.getArcWeight(currentPixel, neighbor, image);
+                        double newCost = costFunction.extendCost(currentCost, arcWeight);
+                        
+                        if (newCost < result.getCost(neighbor)) {
+                            result.setPredecessor(neighbor, currentPixel);
+                            result.setCost(neighbor, newCost);
+                            result.setLabel(neighbor, result.getLabel(currentPixel));
+                            
+                            tieQueue.push(neighbor, static_cast<int>(newCost));
+                        }
+                    }
     }
 }
 

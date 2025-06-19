@@ -3,6 +3,7 @@
 
 #include <queue>
 #include <memory>
+#include <iostream>
 #include "pixel.h"
 #include "image.h"
 #include "seed_set.h"
@@ -136,16 +137,6 @@ protected:
         const Image& image,
         const PathCostFunction& costFunction,
         std::priority_queue<Pixel, std::vector<Pixel>, PixelCostComparator>& queue
-    );
-    
-    // Versão simplificada do processNeighbors para algoritmos otimizados
-    template<typename QueueType>
-    void processNeighbors(
-        const Pixel& currentPixel,
-        IFTResult& result,
-        const Image& image,
-        const PathCostFunction& costFunction,
-        QueueType queuePushFunction
     );
     
     // Atualiza custo de um pixel vizinho

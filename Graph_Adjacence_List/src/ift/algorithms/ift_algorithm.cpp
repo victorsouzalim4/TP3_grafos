@@ -301,4 +301,23 @@ std::unique_ptr<IFTResult> quickIFT(
     
     auto algorithm = createStandardIFT(eightConnected);
     return algorithm->runBasicIFT(image, costFunction, seeds);
+}
+
+// === MÉTODOS AUXILIARES INTERNOS ===
+
+void IFTAlgorithm::initializeIFTMaps(
+    IFTResult& result,
+    const Image& image,
+    const PathCostFunction& costFunction,
+    const SeedSet& seeds) {
+    
+    // Esta função é chamada pelos algoritmos otimizados para inicializar
+    // os mapas IFT antes do processamento principal
+    result.initializeForProcessing(image, seeds);
+    
+    if (verbose) {
+        std::cout << "Mapas IFT inicializados para imagem " 
+                  << image.getWidth() << "x" << image.getHeight() 
+                  << " com " << seeds.getActiveSeeds().size() << " sementes" << std::endl;
+    }
 } 
