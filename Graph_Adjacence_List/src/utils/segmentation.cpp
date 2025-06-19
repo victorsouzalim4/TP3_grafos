@@ -2,7 +2,7 @@
 #include <iostream>
 #include <algorithm>
 
-void Segmentation::segmentGraph(UndirectedGraph& graph, double k, int min_size) {
+vector<int> Segmentation::segmentGraph(UndirectedGraph& graph, double k, int min_size) {
     int n = graph.getVertices().size();
     UnionFind ds(n);
 
@@ -46,8 +46,10 @@ void Segmentation::segmentGraph(UndirectedGraph& graph, double k, int min_size) 
 
     // Agrupar rótulos finais
     std::unordered_map<int, std::vector<std::string>> components;
+    std::vector<int> componentIds(n);
     for (int i = 0; i < n; i++) {
         int root = ds.find(i);
+        componentIds[i] = root;
         components[root].push_back(graph.getVertices()[i].label);
     }
 
@@ -60,5 +62,7 @@ void Segmentation::segmentGraph(UndirectedGraph& graph, double k, int min_size) 
     }
 
     std::cout << "Quantidade de componentes: " << components.size() << std::endl;
+
+    return componentIds;
 }
 
