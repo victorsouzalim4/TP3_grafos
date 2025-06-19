@@ -5,49 +5,45 @@
 #include "utils/imageToGraph.h"
 #include "vertex.h"
 
+#include <opencv2/opencv.hpp> // Novo include
+
 using namespace std;
 
-int main(){
+int main()
+{
 
     UndirectedGraph g;
     Segmentation s;
 
-    // g.addVertex("A");
-    // g.addVertex("B");
-    // g.addVertex("C");
-    // g.addVertex("D");
-    // g.addVertex("E");
+    // Carrega imagem
+    cv::Mat img = cv::imread("./src/images/imagem3.jpg", cv::IMREAD_COLOR);
+    if (img.empty())
+    {
+        cerr << "Erro ao carregar a imagem!" << endl;
+        return -1;
+    }
 
+    int linhas = img.rows;
+    int colunas = img.cols;
 
-    // try {
-    //     g.addEdge("A", "B", 3.5);
-    //     g.addEdge("B", "C");
-    //     g.addEdge("B", "D", 800.0);
-    //     g.addEdge("C", "D", 2000.0);
-    //     g.addEdge("E", "D", 5.0);
-    //     g.addEdge("C", "E", 4000.0);
-    //     s.segmentGraph(g, 5);
-    //     // auto path = g.DFS("A", "E");
-    //     // cout << path.second << endl;
-    //     // for(string v : path.first){
-    //     //     cout << v << "-> ";
-    //     // }
+    // Converte cv::Mat para std::vector<std::vector<std::array<uint8_t, 3>>>
+    std::vector<std::vector<std::array<uint8_t, 3>>> image(linhas, std::vector<std::array<uint8_t, 3>>(colunas));
 
-    // } catch (const exception& e) {
-    //     cerr << "Error: " << e.what() << endl;
-    // }
-
-        std::vector<std::vector<std::array<uint8_t, 3>>> image = {
-        { {255, 0, 0}, {255, 0, 0} },
-        { {0, 0, 255}, {255, 255, 0} },
-        { {0, 0, 255}, {255, 255, 0} }
-    };
+    for (int i = 0; i < linhas; ++i)
+    {
+        for (int j = 0; j < colunas; ++j)
+        {
+            cv::Vec3b pixel = img.at<cv::Vec3b>(i, j);
+            // OpenCV usa BGR, reordenamos para RGB
+            image[i][j] = {pixel[2], pixel[1], pixel[0]};
+        }
+    }
 
     ImageGraphConverter::imageToGraphRGB(image, g, false);
 
     g.print(); // Ver conexões com pesos entre cores
 
-    s.segmentGraph(g, 5);
+    s.segmentGraph(g, 300);
 
 
 

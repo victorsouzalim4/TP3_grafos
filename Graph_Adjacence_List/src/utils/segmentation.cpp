@@ -46,4 +46,6 @@ void Segmentation::segmentGraph(UndirectedGraph& graph, double k) {
             std::cout << " " << label;
         std::cout << std::endl;
     }
+
+    std::cout << "Quantidade de componentes: " << components.size() << std::endl;
 }
