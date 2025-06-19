@@ -25,6 +25,8 @@ int main()
         return -1;
     }
 
+    cv::GaussianBlur(img, img, cv::Size(0, 0), 0.8); // sigma = 0.8
+
     int linhas = img.rows;
     int colunas = img.cols;
 
