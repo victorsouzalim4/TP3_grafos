@@ -6,7 +6,7 @@ OPENCV_DIR := third_party/opencv
 
 # Arquivos fonte
 SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
-TARGET := $(BUILD_DIR)/grafos
+TARGET := $(BUILD_DIR)/ift_image_processor
 
 # Configuração do compilador
 CXX := g++
