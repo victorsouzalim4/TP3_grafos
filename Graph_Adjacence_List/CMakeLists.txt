@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.14)
 project(Graph_Adjacence_List CXX)
 
+# Comentando find_package por enquanto - usando configuração manual
+# find_package(OpenCV REQUIRED)
+# include_directories(${OpenCV_INCLUDE_DIRS})
+
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -27,13 +32,18 @@ set(OpenCV_LIBS
     opencv_imgcodecs455
 )
 
-# Coletar todos os arquivos fonte incluindo o novo arquivo OpenCV bridge
-file(GLOB SRC_FILES 
-    src/*.cpp
-    src/*/*.cpp
-    src/*/*/*.cpp
+# Especificar arquivos fonte explicitamente
+set(SRC_FILES
+    src/ift/data_structures/pixel.cpp
+    src/ift/data_structures/image.cpp
+    src/ift/data_structures/seed_set.cpp
+    src/ift/algorithms/path_cost_function.cpp
+    src/ift/ift_result.cpp
+    src/ift/algorithms/ift_algorithm.cpp
+    src/ift/data_structures/bucket_queue.cpp
+    src/ift/algorithms/ift_optimized_algorithm.cpp
+    src/utils/opencv_ift_bridge.cpp
 )
-list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/ift_image_processor.cpp)
 
 # Lib principal
 add_library(graphlib ${SRC_FILES})
@@ -41,7 +51,8 @@ add_library(graphlib ${SRC_FILES})
 
 # Executável do processador de imagens IFT
 add_executable(IFTImageProcessor src/ift_image_processor.cpp)
-target_link_libraries(IFTImageProcessor graphlib ${OpenCV_LIBS})
+target_link_libraries(IFTImageProcessor ${OpenCV_LIBS})
+
 
 # Adicionar o diretório bin do OpenCV ao PATH durante o build (para encontrar DLLs)
 if(WIN32)

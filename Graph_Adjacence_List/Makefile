@@ -3,6 +3,11 @@
 SRC_DIR := src
 INC_DIR := include
 OPENCV_DIR := third_party/opencv
+BUILD_DIR := build
+
+# Arquivos fonte
+SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
+TARGET := $(BUILD_DIR)/ift_image_processor.exe
 
 # Arquivos fonte específicos do IFT
 IFT_SOURCES := $(SRC_DIR)/ift/data_structures/pixel.cpp \
@@ -17,7 +22,7 @@ IFT_SOURCES := $(SRC_DIR)/ift/data_structures/pixel.cpp \
                $(SRC_DIR)/ift_image_processor.cpp
 
 # Target principal
-TARGET := ift_image_processor.exe
+
 
 # Configuração do compilador SEM linkagem estática conflitante
 CXX := g++
@@ -38,11 +43,13 @@ all: $(TARGET)
 
 # Como gerar o binário
 $(TARGET): $(IFT_SOURCES)
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 # Limpar
 clean:
-	@if exist $(TARGET) del $(TARGET)
+	@if exist $(BUILD_DIR)\*.exe del $(BUILD_DIR)\*.exe
+	@if exist $(BUILD_DIR)\*.o del $(BUILD_DIR)\*.o
 
 run: all
 	./$(TARGET)

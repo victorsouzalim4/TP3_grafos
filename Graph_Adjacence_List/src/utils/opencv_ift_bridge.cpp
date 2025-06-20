@@ -1,4 +1,5 @@
 #include "utils/opencv_ift_bridge.h"
+#include <opencv2/opencv.hpp>
 #include "ift_result.h"
 #include <iostream>
 
